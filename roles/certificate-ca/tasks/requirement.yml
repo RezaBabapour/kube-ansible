@@ -1,0 +1,24 @@
+---
+- name: install git
+  apt:
+    name: git
+    update_cache: yes
+
+- name: install kubectl
+  copy:
+    src: files/{{ kubernetes.version }}/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: a+x
+    remote_src: yes
+
+- name: install cfssl
+  get_url:
+    url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_amd64
+    dest: /usr/local/bin/cfssl
+    mode: a+x
+
+- name: install cfssljson
+  get_url:
+    url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_amd64
+    dest: /usr/local/bin/cfssljson
+    mode: a+x

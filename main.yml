@@ -1,0 +1,13 @@
+#
+# This roles generate CA & kubeconfig in deployer node
+# deployer node send the CA & kubeconfig into all nodes
+#
+- name: generate certificate & kubeconfig
+  become: yes
+  hosts: deployer
+  connection: local
+  roles:
+    - certificate-ca
+      #    - certificate-etcd
+      #    - certificate-master
+      #    - certificate-worker
