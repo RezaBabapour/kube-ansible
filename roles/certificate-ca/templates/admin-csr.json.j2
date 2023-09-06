@@ -1,0 +1,14 @@
+{
+  "CN": "admin",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [{
+        "C": "{{ infrastructure.ca.country }}",
+        "L": "{{ infrastructure.ca.city }}",
+        "O": "Kubernetes {{ kubernetes.clusterName }}",
+        "OU": "{{ infrastructure.ca.organizationUnit }}",
+        "ST": "{{ infrastructure.ca.province }}"
+    }]
+}

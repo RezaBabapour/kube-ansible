@@ -1,4 +1,19 @@
 ansible_python_interpreter: /usr/bin/python3
 
 kubernetes:
+  clusterName: cluster-01
   version: v1.25.13
+  certificate:
+    directory: /opt/kuber/certs
+
+infrastructure:
+  ca:
+    expireTime: 175200h
+    certificate:
+      expireTime: 8760h
+    city: Tehran
+    country: IR
+    organizationUnit: Kubernetes
+    province: Tehran
+
+user: root

@@ -1,0 +1,31 @@
+---
+- name: Copy certs into worker nodes
+  vars:
+    workers: "{{ groups['worker'] | join(' ') }}"
+  args:
+    chdir: "{{ kubernetes.certificate.directory }}"
+  shell: |
+    for instance in {{ workers }}; do
+      scp ca.pem {{ user }}@${instance}:~/ca.pem
+      scp ${instance}.pem {{ user }}@${instance}:~/${instance}.pem
+      scp ${instance}-key.pem {{ user }}@${instance}:~/${instance}-key.pem
+    done
+  tags:
+    - copy_certs
+
+- name: Copy certs into controller nodes
+  vars:
+    controllers: "{{ groups['controller'] | join(' ') }}"
+  args:
+    chdir: "{{ kubernetes.certificate.directory }}"
+  shell: |
+    for instance in {{ controllers }}; do
+      scp ca.pem {{ user }}@${instance}:~/ca.pem
+      scp ca-key.pem {{ user }}@${instance}:~/ca-key.pem
+      scp kubernetes.pem {{ user }}@${instance}:~/kubernetes.pem
+      scp kubernetes-key.pem {{ user }}@${instance}:~/kubernetes-key.pem
+      scp service-account-key.pem {{ user }}@${instance}:~/service-account-key.pem
+      scp service-account.pem {{ user }}@${instance}:~/service-account.pem
+    done
+  tags:
+    - copy_certs
