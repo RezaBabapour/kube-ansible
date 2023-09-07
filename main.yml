@@ -2,10 +2,23 @@
 # This roles generate CA & kubeconfig in deployer node
 # deployer node send the CA & kubeconfig into all nodes
 #
-- name: generate certificate & kubeconfig
+- name: Generate certificate & kubeconfig
   become: yes
   hosts: deployer
   connection: local
   roles:
     - certificate-ca
     - kubeconfig
+
+- name: Copy binaries to nodes
+  become: yes
+  hosts: deployer
+  connection: local
+  roles:
+    - copy-bin
+
+- name: Create etcd cluster
+  become: yes
+  hosts: etcd
+  roles:
+    - etcd

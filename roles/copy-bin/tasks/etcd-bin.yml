@@ -1,0 +1,10 @@
+---
+- name: Copy etcd binaries to etcd nodes
+  vars:
+    etcds: "{{ groups['etcd'] | join(' ') }}"
+  shell: |
+    for instance in {{ etcds }}; do
+      scp files/v1.25.13/etcd/etcd* {{ user }}@${instance}:/usr/local/bin
+    done
+  tags:
+    - etcd-bin      
