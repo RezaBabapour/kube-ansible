@@ -8,6 +8,4 @@
   connection: local
   roles:
     - certificate-ca
-      #    - certificate-etcd
-      #    - certificate-master
-      #    - certificate-worker
+    - kubeconfig
