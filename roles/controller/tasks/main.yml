@@ -1,0 +1,105 @@
+---
+- name: Change permissions of bin files
+  file:
+    path: /usr/local/bin
+    recurse: yes 
+    mode: '0700'
+  tags:
+    - controller
+
+- name: Create /var/lib/kubernetes/ & /etc/kubernetes/config directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0700'
+  loop:
+    - /var/lib/kubernetes/
+    - /etc/kubernetes/config
+  tags:
+    - controller
+
+- name: Copy certs to /var/lib/kubernetes/
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/kubernetes/
+  with_items:
+    - ~/ca.pem
+    - ~/kubernetes-key.pem
+    - ~/kubernetes.pem
+    - ~/service-account-key.pem
+    - ~/service-account.pem
+    - ~/encryption-config.yaml
+    - ~/kube-controller-manager.kubeconfig
+    - ~/kube-scheduler.kubeconfig
+  tags:
+    - controller
+
+- name: Create Kubernetes API Server systemd unit file
+  template:
+    src: kube-apiserver.service.j2 
+    dest: /etc/systemd/system/kube-apiserver.service
+    mode: 644
+  tags:
+    - controller
+
+- name: Create Kubernetes Controller Manager systemd unit file
+  template:
+    src: kube-controller-manager.service.j2
+    dest: /etc/systemd/system/kube-controller-manager.service
+    mode: 644
+  tags:
+    - controller
+
+- name: Create Kubernetes Scheduler config file
+  template:
+    src: kube-scheduler.yaml.j2
+    dest: /etc/kubernetes/config/kube-scheduler.yaml
+    mode: 644
+  tags:
+    - controller
+
+- name: Create Kubernetes Scheduler systemd unit file
+  template:
+    src: kube-scheduler.service.j2
+    dest: /etc/systemd/system/kube-scheduler.service
+    mode: 644
+  tags:
+    - controller
+
+- name: Restart Controller Services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+  tags:
+    - controller
+
+      #- name: Create ClusterRole
+      #      shell: |
+      #        kubectl apply --kubeconfig admin.kubeconfig -f -
+      #        apiVersion: rbac.authorization.k8s.io/v1
+      #        kind: ClusterRole
+      #        metadata:
+      #          annotations:
+      #            rbac.authorization.kubernetes.io/autoupdate: "true"
+      #          labels:
+      #            kubernetes.io/bootstrapping: rbac-defaults
+      #          name: system:kube-apiserver-to-kubelet
+      #        rules:
+      #          - apiGroups:
+      #              - ""
+      #            resources:
+      #              - nodes/proxy
+      #              - nodes/stats
+      #              - nodes/log
+      #              - nodes/spec
+      #              - nodes/metrics
+      #            verbs:
+      #              - "*"
+      #  tags:
+      #    - controller

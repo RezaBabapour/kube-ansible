@@ -22,3 +22,9 @@
   hosts: etcd
   roles:
     - etcd
+
+- name: Setup controller cluster
+  become: yes
+  hosts: controller
+  roles:
+    - controller
