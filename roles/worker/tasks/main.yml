@@ -1,0 +1,36 @@
+---
+- name: Update package cache
+  apt:
+    update_cache: yes
+  tags:
+    - worker
+
+- name: Install socat, conntrack, and ipset
+  apt:
+    name:
+      - socat
+      - conntrack
+      - ipset
+    state: present
+  tags:
+    - worker
+
+- name: Disable SWAP
+  shell: |
+    swapoff -a
+  tags:
+    - worker
+
+- name: Create Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/cni/net.d
+    - /opt/cni/bin
+    - /var/lib/kubelet
+    - /var/lib/kube-proxy
+    - /var/lib/kubernetes
+    - /var/run/kubernetes
+  tags:
+    - worker

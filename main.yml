@@ -28,3 +28,9 @@
   hosts: controller
   roles:
     - controller
+
+- name: Setup worker nodes
+  become: yes
+  hosts: worker
+  roles:
+    - worker
