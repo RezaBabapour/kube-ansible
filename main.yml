@@ -34,3 +34,5 @@
   hosts: worker
   roles:
     - worker
+  tags:
+    - worker
