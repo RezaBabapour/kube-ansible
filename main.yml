@@ -28,6 +28,8 @@
   hosts: controller
   roles:
     - controller
+  tags:
+    - controller
 
 - name: Setup worker nodes
   become: yes
@@ -36,3 +38,11 @@
     - worker
   tags:
     - worker
+
+- name: Setup CNI & DNS
+  become: yes
+  hosts: controller
+  roles:
+    - addons
+  tags:
+    - addons

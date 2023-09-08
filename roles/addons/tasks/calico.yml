@@ -1,0 +1,13 @@
+---
+- name: Prepare calico config
+  template:
+    src: kube-calico.yml.j2
+    dest: ~/kube-calico.yml
+    mode: 644
+  run_once: true
+
+- name: Deploy calico in cluster
+  shell: |
+    kubectl apply -f ~/kube-calico.yml
+  run_once: true
+
