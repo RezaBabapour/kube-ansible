@@ -1,8 +1,11 @@
 ---
 - name: install git
   apt:
-    name: git
+    name: "{{ item }}"
     update_cache: yes
+  with_items:
+    - git
+    - rsync 
 
 - name: install kubectl
   copy:

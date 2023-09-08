@@ -7,8 +7,6 @@
   loop:
     - /etc/etcd
     - /var/lib/etcd
-  tags:
-    - etcd
 
 - name: Copy files to /etc/etcd
   copy:
@@ -18,16 +16,12 @@
     - ~/ca.pem
     - ~/kubernetes-key.pem
     - ~/kubernetes.pem
-  tags:
-    - etcd
 
 - name: Create etcd systemd unit file
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
     mode: 644
-  tags:
-    - etcd
 
 - name: Restart etcd
   systemd:
@@ -35,5 +29,3 @@
     state: restarted
     daemon_reload: yes
     enabled: yes
-  tags:
-    - etcd

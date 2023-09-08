@@ -3,51 +3,37 @@
   file:
     path: "{{ kubernetes.certificate.directory }}"
     state: directory
-  tags:
-    - cert_gen
 
 - name: Create CA configuration file
   template:
     src: ca-config.json.j2
     dest: "{{ kubernetes.certificate.directory }}/ca-config.json"
-  tags:
-    - cert_gen
 
 - name: Create CA CSR file
   template:
     src: ca-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/ca-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate CA certificate and key
   shell: cfssl gencert -initca {{ kubernetes.certificate.directory }}/ca-csr.json | cfssljson -bare ca
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen
 
 - name: Create Admin CSR file
   template:
     src: admin-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/admin-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate Admin certificate and key
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen
 
 - name: Create Worker CSR file
   template:
     src: worker-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/{{ item }}-csr.json"
   with_items: "{{ groups['worker'] }}"
-  tags:
-    - cert_gen
 
 - name: Generate worker node certificates
   shell: >
@@ -58,70 +44,50 @@
   with_items: "{{ groups['worker'] }}"
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen
 
 - name: Create Controller Manager Client CSR file
   template:
     src: kube-controller-manager-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/kube-controller-manager-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate Controller Manager Client certificate and key
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen
 
 - name: Create Kube Proxy Client CSR file
   template:
     src: kube-proxy-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/kube-proxy-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate Kube Proxy Client certificate and key
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen     
 
 - name: Create Scheduler Client CSR file
   template:
     src: kube-scheduler-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/kube-scheduler-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate Scheduler Client certificate and key
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen 
 
 - name: Set Kubernetes Public Address
   set_fact:
     kubernetes_public_address: "{{ kubernetes_public_address|default([]) + [hostvars[item].external_ip] }}"  
   loop: "{{ groups['controller'] }}"
-  tags:
-    - cert_gen
 
 - name: Set Kubernetes Hostnames
   set_fact:
     kubernetes_hostnames: "kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local,10.32.0.1,127.0.0.1,{% for node in groups['etcd'] %}{{ hostvars[node].ansible_host }}{% if not loop.last %},{% endif %}{% endfor %}"
-  tags:
-    - cert_gen
 
 - name: Create Kubernetes CSR JSON file
   template:
     src: kubernetes-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/kubernetes-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate Kubernetes Certificate and Key
   shell: |
@@ -129,19 +95,13 @@
       -hostname={{ kubernetes_public_address | join(',') }},{{ kubernetes_hostnames }} -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen
 
 - name: Create Service Account CSR file
   template:
     src: service-account-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/service-account-csr.json"
-  tags:
-    - cert_gen
 
 - name: Generate Service Account certificate and key
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes service-account-csr.json | cfssljson -bare service-account
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
-  tags:
-    - cert_gen 

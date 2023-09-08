@@ -7,4 +7,4 @@
       scp files/v1.25.13/etcd/etcd* {{ user }}@${instance}:/usr/local/bin
     done
   tags:
-    - etcd-bin      
+    - etcd-bin
