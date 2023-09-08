@@ -1,0 +1,8 @@
+---
+- name: Prepare and deploy coredns
+  shell: |
+    curl https://raw.githubusercontent.com/coredns/deployment/coredns-1.14.0/kubernetes/coredns.yaml.sed -o coredns.yaml.sed
+    curl https://raw.githubusercontent.com/coredns/deployment/coredns-1.14.0/kubernetes/deploy.sh -o deploy.sh
+    bash ./deploy.sh -s -i 10.32.0.10 > coredns.yaml
+    kubectl apply -f coredns.yaml    
+  run_once: true 
