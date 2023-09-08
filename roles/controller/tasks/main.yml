@@ -4,8 +4,6 @@
     path: /usr/local/bin
     recurse: yes 
     mode: '0700'
-  tags:
-    - controller
 
 - name: Create /var/lib/kubernetes/ & /etc/kubernetes/config directories
   file:
@@ -15,8 +13,6 @@
   loop:
     - /var/lib/kubernetes/
     - /etc/kubernetes/config
-  tags:
-    - controller
 
 - name: Copy certs to /var/lib/kubernetes/
   copy:
@@ -32,40 +28,30 @@
     - ~/encryption-config.yaml
     - ~/kube-controller-manager.kubeconfig
     - ~/kube-scheduler.kubeconfig
-  tags:
-    - controller
 
 - name: Create Kubernetes API Server systemd unit file
   template:
     src: kube-apiserver.service.j2 
     dest: /etc/systemd/system/kube-apiserver.service
     mode: 644
-  tags:
-    - controller
 
 - name: Create Kubernetes Controller Manager systemd unit file
   template:
     src: kube-controller-manager.service.j2
     dest: /etc/systemd/system/kube-controller-manager.service
     mode: 644
-  tags:
-    - controller
 
 - name: Create Kubernetes Scheduler config file
   template:
     src: kube-scheduler.yaml.j2
     dest: /etc/kubernetes/config/kube-scheduler.yaml
     mode: 644
-  tags:
-    - controller
 
 - name: Create Kubernetes Scheduler systemd unit file
   template:
     src: kube-scheduler.service.j2
     dest: /etc/systemd/system/kube-scheduler.service
     mode: 644
-  tags:
-    - controller
 
 - name: Restart Controller Services
   systemd:
@@ -77,30 +63,71 @@
     - kube-apiserver
     - kube-controller-manager
     - kube-scheduler
-  tags:
-    - controller
 
-      #- name: Create ClusterRole
-      #      shell: |
-      #        kubectl apply --kubeconfig admin.kubeconfig -f -
-      #        apiVersion: rbac.authorization.k8s.io/v1
-      #        kind: ClusterRole
-      #        metadata:
-      #          annotations:
-      #            rbac.authorization.kubernetes.io/autoupdate: "true"
-      #          labels:
-      #            kubernetes.io/bootstrapping: rbac-defaults
-      #          name: system:kube-apiserver-to-kubelet
-      #        rules:
-      #          - apiGroups:
-      #              - ""
-      #            resources:
-      #              - nodes/proxy
-      #              - nodes/stats
-      #              - nodes/log
-      #              - nodes/spec
-      #              - nodes/metrics
-      #            verbs:
-      #              - "*"
-      #  tags:
-      #    - controller
+- name: Create ClusterRole to access the Kubelet API
+  command: kubectl apply --kubeconfig admin.kubeconfig -f -
+  args:
+    stdin: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: system:kube-apiserver
+        namespace: ""
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:kube-apiserver-to-kubelet
+      subjects:
+        - apiGroup: rbac.authorization.k8s.io
+          kind: User
+          name: kubernetes
+  run_once: true
+
+- name: Bind the system:kube-apiserver-to-kubelet ClusterRole to the kubernetes user
+  command: kubectl apply --kubeconfig admin.kubeconfig -f -
+  args:
+    stdin: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: system:kube-apiserver
+        namespace: ""
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:kube-apiserver-to-kubelet
+      subjects:
+        - apiGroup: rbac.authorization.k8s.io
+          kind: User
+          name: kubernetes
+  run_once: true
+
+- name: Set lb_IP variable
+  set_fact:
+    lb_IP: "{{ hostvars[item].external_ip }}"
+  when: hostvars[item].loadbalancer is defined
+  with_items: "{{ groups['all'] }}"
+  loop_control:
+    label: "{{ item }}"
+
+- name: Copy admin certs to ~/
+  copy:
+    src: "{{ item }}"
+    dest: ~/
+  with_items:
+    - ~/admin.pem
+    - ~/admin-key.pem
+
+- name: Configuring kubectl for Remote Access
+  shell: |
+    kubectl config set-cluster kubernetes-the-hard-way \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://"{{ lb_IP }}":6443
+    kubectl config set-credentials admin \
+    --client-certificate=admin.pem \
+    --client-key=admin-key.pem
+    kubectl config set-context kubernetes-the-hard-way \
+    --cluster=kubernetes-the-hard-way \
+    --user=admin
+    kubectl config use-context kubernetes-the-hard-way    
