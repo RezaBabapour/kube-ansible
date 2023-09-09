@@ -14,10 +14,22 @@
     src: ca-csr.json.j2
     dest: "{{ kubernetes.certificate.directory }}/ca-csr.json"
 
-- name: Generate CA certificate and key
-  shell: cfssl gencert -initca {{ kubernetes.certificate.directory }}/ca-csr.json | cfssljson -bare ca
+- name: Check if CA certificate exists
+  stat:
+    path: "{{ kubernetes.certificate.directory }}/ca.pem"
+  register: ca_certificate
+
+- debug:
+    var: ca_certificate.stat.exists
+
+- name: Generate CA certificate and key if not exists
+  shell: |
+    if [ ! -e "{{ kubernetes.certificate.directory }}/ca.pem" ]; then
+      cfssl gencert -initca {{ kubernetes.certificate.directory }}/ca-csr.json | cfssljson -bare ca
+    fi
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
+  when: not ca_certificate.stat.exists
 
 - name: Create Admin CSR file
   template:
