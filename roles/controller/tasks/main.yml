@@ -110,14 +110,6 @@
   loop_control:
     label: "{{ item }}"
 
-- name: Copy admin certs to ~/
-  copy:
-    src: "{{ item }}"
-    dest: ~/
-  with_items:
-    - ~/admin.pem
-    - ~/admin-key.pem
-
 - name: Configuring kubectl for Remote Access
   shell: |
     kubectl config set-cluster kubernetes-the-hard-way \

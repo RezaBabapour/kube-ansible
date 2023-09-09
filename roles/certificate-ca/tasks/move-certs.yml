@@ -22,6 +22,8 @@
     for instance in {{ controllers }}; do
       scp ca.pem {{ user }}@${instance}:~/ca.pem
       scp ca-key.pem {{ user }}@${instance}:~/ca-key.pem
+      scp admin.pem {{ user }}@${instance}:~/admin.pem
+      scp admin-key.pem {{ user }}@${instance}:~/admin-key.pem
       scp kubernetes.pem {{ user }}@${instance}:~/kubernetes.pem
       scp kubernetes-key.pem {{ user }}@${instance}:~/kubernetes-key.pem
       scp service-account-key.pem {{ user }}@${instance}:~/service-account-key.pem
