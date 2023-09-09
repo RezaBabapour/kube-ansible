@@ -8,6 +8,7 @@
 
 - name: Deploy calico in cluster
   shell: |
+    kubectl delete -f ~/kube-calico.yml
     kubectl apply -f ~/kube-calico.yml
   run_once: true
 

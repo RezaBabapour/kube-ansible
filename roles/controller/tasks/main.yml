@@ -64,6 +64,10 @@
     - kube-controller-manager
     - kube-scheduler
 
+- name: Wait for 20 seconds to controller services start
+  pause:
+    seconds: 20
+
 - name: Create ClusterRole to access the Kubelet API
   command: kubectl apply --kubeconfig admin.kubeconfig -f -
   args:
@@ -82,6 +86,10 @@
           kind: User
           name: kubernetes
   run_once: true
+  register: clusterRole
+
+- debug:
+    var: clusterRole.stdout
 
 - name: Bind the system:kube-apiserver-to-kubelet ClusterRole to the kubernetes user
   command: kubectl apply --kubeconfig admin.kubeconfig -f -
