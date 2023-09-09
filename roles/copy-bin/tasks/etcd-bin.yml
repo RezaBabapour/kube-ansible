@@ -1,4 +1,15 @@
 ---
+- name: Stop etcd.service if running
+  vars:
+    etcds: "{{ groups['etcd'] | join(' ') }}"
+  shell: |
+    for instance in {{ etcds }}; do
+      ssh -tq {{ user }}@${instance} "systemctl stop etcd.service"
+    done
+  ignore_errors: yes
+  tags:
+    - etcd-bin
+
 - name: Copy etcd binaries to etcd nodes
   vars:
     etcds: "{{ groups['etcd'] | join(' ') }}"
@@ -8,3 +19,15 @@
     done
   tags:
     - etcd-bin
+
+- name: Start etcd.service
+  vars:
+    etcds: "{{ groups['etcd'] | join(' ') }}"
+  shell: |
+    for instance in {{ etcds }}; do
+      ssh -tq {{ user }}@${instance} "systemctl start etcd.service"
+    done
+  ignore_errors: yes
+  tags:
+    - etcd-bin
+
