@@ -4,13 +4,13 @@
     workers: "{{ groups['worker'] | join(' ') }}"
   shell: |
     for instance in {{ workers }}; do
-      scp files/v1.25.13/crictl {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/kubectl {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/kube-proxy {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/kubelet {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/runc {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/containerd/bin/* {{ user }}@${instance}:/bin
-      rsync -a --mkpath files/v1.25.13/cni/* {{ user }}@${instance}:/opt/cni/bin
+      scp files/{{ kubernetes.version }}/crictl {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kubectl {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kube-proxy {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kubelet {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/runc {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/containerd/bin/* {{ user }}@${instance}:/bin
+      rsync -a --mkpath files/{{ kubernetes.version }}/cni/* {{ user }}@${instance}:/opt/cni/bin
     done
   tags:
     - worker-bin

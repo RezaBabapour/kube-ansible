@@ -4,10 +4,10 @@
     controllers: "{{ groups['controller'] | join(' ') }}"
   shell: |
     for instance in {{ controllers }}; do
-      scp files/v1.25.13/kube-apiserver {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/kube-controller-manager {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/kube-scheduler {{ user }}@${instance}:/usr/local/bin
-      scp files/v1.25.13/kubectl {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kube-apiserver {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kube-controller-manager {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kube-scheduler {{ user }}@${instance}:/usr/local/bin
+      scp files/{{ kubernetes.version }}/kubectl {{ user }}@${instance}:/usr/local/bin
     done
   tags:
     - controller-bin
