@@ -1,5 +1,4 @@
 ---
-- include: requirement.yml
 - include: certificate-ca.yml
 - include: move-certs.yml
   become: yes
