@@ -1,0 +1,9 @@
+---
+- include: cordon-worker.yml
+- include: drain-worker.yml
+- include: stop-worker.yml
+- include: copy-bin.yml
+- include: start-worker.yml
+- include: uncordon-worker.yml
+  become: yes
+  become_user: "{{ user }}"

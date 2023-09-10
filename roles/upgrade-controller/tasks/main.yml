@@ -1,0 +1,6 @@
+---
+- include: stop-controller.yml
+- include: copy-bin.yml
+- include: start-controller.yml
+  become: yes
+  become_user: "{{ user }}"

@@ -1,0 +1,17 @@
+- name: Upgrade Kubernetes controllers
+  become: yes
+  hosts: controller
+  serial: 1
+  roles:
+    - upgrade-controller
+  tags:
+    - upgrade-controller
+
+- name: Upgrade Kubernetes workers
+  become: yes
+  hosts: worker
+  serial: 1
+  roles:
+    - upgrade-worker
+  tags:
+    - upgrade-worker

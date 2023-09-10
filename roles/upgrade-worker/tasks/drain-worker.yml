@@ -1,0 +1,4 @@
+- name: Drain the worker node
+  shell: |
+    kubectl drain "{{ inventory_hostname }}" --ignore-daemonsets
+  delegate_to: "{{ groups['controller'] | first }}"

@@ -1,0 +1,4 @@
+- name: Uncordon the worker node
+  shell: |
+    kubectl uncordon "{{ inventory_hostname }}"
+  delegate_to: "{{ groups['controller'] | first }}"

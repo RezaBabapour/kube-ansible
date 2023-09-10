@@ -1,0 +1,10 @@
+---
+- name: Stop Worker Services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - kube-proxy
+    - kubelet
+    - containerd
+

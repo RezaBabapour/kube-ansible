@@ -1,0 +1,10 @@
+---
+- name: Stop Controller Services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+

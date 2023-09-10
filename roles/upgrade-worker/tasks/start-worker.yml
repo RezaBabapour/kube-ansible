@@ -1,0 +1,13 @@
+- name: Restart worker Services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  with_items:
+    - kube-proxy
+    - kubelet
+    - containerd
+
+- name: Wait 1 minute for services to start
+  pause:
+    minutes: 1

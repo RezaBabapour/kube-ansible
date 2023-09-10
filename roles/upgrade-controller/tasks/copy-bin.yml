@@ -1,0 +1,7 @@
+- name: Copy controller binaries to controller nodes
+  shell: |
+    rsync --chmod=700 "{{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-apiserver" "{{ user }}@{{ inventory_hostname }}:/usr/local/bin"
+    rsync --chmod=700 "{{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-controller-manager" "{{ user }}@{{ inventory_hostname }}:/usr/local/bin"
+    rsync --chmod=700 "{{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-scheduler" "{{ user }}@{{ inventory_hostname }}:/usr/local/bin"
+    rsync --chmod=700 "{{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kubectl" "{{ user }}@{{ inventory_hostname }}:/usr/local/bin"
+  delegate_to: deployer

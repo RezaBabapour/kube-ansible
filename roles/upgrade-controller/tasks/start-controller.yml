@@ -1,0 +1,13 @@
+- name: Restart Controller Services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+
+- name: Wait 1 minute for services to start
+  pause:
+    minutes: 1
