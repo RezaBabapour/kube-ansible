@@ -2,13 +2,18 @@ ansible_python_interpreter: /usr/bin/python3
 
 kubernetes:
   clusterName: cluster-01
-  version: v1.25.13
+  version: v1.26.8
+
+  manifests:
+    dir: /opt/kuber/manifests
 
   certificate:
     directory: /opt/kuber/certs
 
   encryptionProvider:
     key: Wrc71ysY7XogUdoMydyuoHZjkgKFAuK5ViwxcnJ17uk=
+  bin:
+    directory: /opt/kube-ansible/files
 
 infrastructure:
   ca:

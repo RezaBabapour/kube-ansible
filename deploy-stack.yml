@@ -1,0 +1,12 @@
+- name: Copy "{{ service }}" manifests
+  become: yes
+  hosts: deployer
+  roles:
+    - pre-service
+
+- name: Deploy "{{ service }}"
+  become: yes
+  hosts: controller
+  run_once: true
+  roles:
+    - deploy-service

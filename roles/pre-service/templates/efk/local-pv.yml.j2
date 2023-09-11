@@ -1,0 +1,26 @@
+{% for host in groups['worker'] %}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv-{{ loop.index0 }}
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /var/local/elasticsearch-data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ host }}
+{% if not loop.last %}{% endif %}
+{% endfor %}
+

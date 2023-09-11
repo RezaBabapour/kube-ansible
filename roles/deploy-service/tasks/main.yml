@@ -1,0 +1,24 @@
+---
+- name: Create service directory in controller
+  file:
+      path: "{{ kubernetes.manifests.dir }}/{{ service }}"
+      state: directory
+
+- name: Copy "{{ service }}" manifests to controller 
+  shell: |
+    rsync -az "{{ kubernetes.manifests.dir }}/{{ service }}" "{{ user }}@{{ inventory_hostname }}:~/"
+  delegate_to: deployer
+
+- name: Find namespace creation files
+  find:
+    paths: "~/{{ service }}"
+    patterns: '*-ns.yml'
+  register: namespace_files
+
+- name: Apply namespace creation files
+  shell: kubectl apply -f "{{ item.path }}"
+  loop: "{{ namespace_files.files }}"
+  when: namespace_files.matched > 0
+
+- name: Apply other files
+  shell: kubectl apply -f ~/{{ service }}

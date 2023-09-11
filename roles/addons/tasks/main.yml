@@ -2,5 +2,6 @@
 - include: calico.yml
 - include: coredns.yml
 - include: ingress-controller.yml
+- include: storageclass.yml
   become: yes
   become_user: "{{ user }}"

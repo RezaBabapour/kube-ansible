@@ -1,0 +1,13 @@
+---
+- name: Create service directory
+  file:
+      path: "{{ kubernetes.manifests.dir }}/{{ service }}"
+      state: directory
+
+- name: Copy "{{ service }}" manifests to "{{ kubernetes.manifests.dir }}/{{ service }}"
+  template:
+    src: '{{ item.src }}'
+    dest: "{{ kubernetes.manifests.dir }}/{{ service }}/{{ item.path | regex_replace('.j2$', '') }}"
+  with_filetree: '../templates/{{ service }}'
+  when: item.state == 'file'
+
