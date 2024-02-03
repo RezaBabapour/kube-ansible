@@ -1,31 +1,33 @@
 ---
-- name: Install Helm
-  shell: |
-    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null &&
-    apt-get install apt-transport-https --yes &&
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list &&
-    apt-get update &&
-    apt-get install helm -y
+# - name: Install Helm
+#   shell: |
+#     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null &&
+#     apt-get install apt-transport-https --yes &&
+#     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list &&
+#     apt-get update &&
+#     apt-get install helm -y
 
-- name: install git
-  apt:
+- name: Install base packages
+  yum:
     name: ['git', 'rsync']
 
-- name: install kubectl
+- name: Install kubectl
   copy:
-    src: files/{{ kubernetes.version }}/kubectl
-    dest: /usr/local/bin/kubectl
+    src: "{{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kubectl"
+    dest: /usr/bin/kubectl
     mode: a+x
     remote_src: yes
 
-- name: install cfssl
-  get_url:
-    url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_amd64
-    dest: /usr/local/bin/cfssl
+- name: Install cfssl  
+  copy:
+    src: "{{ kubernetes.bin.directory }}/cfssl_1.6.4_linux_amd64"
+    dest: /usr/bin/cfssl
     mode: a+x
+    remote_src: yes
 
-- name: install cfssljson
-  get_url:
-    url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_amd64
-    dest: /usr/local/bin/cfssljson
+- name: Install cfssljson
+  copy:
+    src: "{{ kubernetes.bin.directory }}/cfssljson_1.6.4_linux_amd64"
+    dest: /usr/bin/cfssljson
     mode: a+x
+    remote_src: yes

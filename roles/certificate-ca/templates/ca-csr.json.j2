@@ -1,14 +1,14 @@
 {
-  "CN": "Kubernetes",
+  "CN": "Kubernetes {{ kubernetes.clusterName }}",
   "key": {
     "algo": "rsa",
     "size": 2048
   },
   "names": [{
-        "C": "{{ infrastructure.ca.country }}",
-        "L": "{{ infrastructure.ca.city }}",
-        "O": "Kubernetes",
-        "OU": "{{ infrastructure.ca.organizationUnit }}",
-        "ST": "{{ infrastructure.ca.province }}"
+        "C": "{{ pki.ca.country }}",
+        "L": "{{ pki.ca.city }}",
+        "O": "Kubernetes {{ kubernetes.clusterName }}",
+        "OU": "{{ pki.ca.organizationUnit }}",
+        "ST": "{{ pki.ca.province }}"
     }]
 }

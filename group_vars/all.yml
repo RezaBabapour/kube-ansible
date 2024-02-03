@@ -1,28 +1,28 @@
 ansible_python_interpreter: /usr/bin/python3
+# ansible_connection: ssh 
+# ansible_ssh_user: babapour 
 
 kubernetes:
-  clusterName: cluster-01
-  version: v1.26.8
-
-  manifests:
-    dir: /opt/kuber/manifests
+  clusterName: podspace-pardis-01
+  version: v1.29.1
+  # manifests:
+  #   dir: /opt/kube-ansible/manifests
 
   certificate:
-    directory: /opt/kuber/certs
+    directory: /home/{{ ansible_ssh_user }}/kube-ansible/certs
 
   encryptionProvider:
     key: Wrc71ysY7XogUdoMydyuoHZjkgKFAuK5ViwxcnJ17uk=
   bin:
-    directory: /opt/kube-ansible/files
+    directory: /home/{{ ansible_ssh_user }}/kube-ansible/files
 
-infrastructure:
+pki:
   ca:
     expireTime: 175200h
     certificate:
       expireTime: 8760h
     city: Tehran
     country: IR
-    organizationUnit: Kubernetes
+    organizationUnit: Podspace
     province: Tehran
 
-user: root
