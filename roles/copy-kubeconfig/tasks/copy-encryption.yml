@@ -1,0 +1,7 @@
+---
+- name: Copy Encryption Config into controller nodes
+  shell: |
+    scp -o StrictHostKeyChecking=no encryption-config.yaml {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/
+  with_items: "{{ groups['controller'] }}"
+  args:
+    chdir: "{{ kubernetes.certificate.directory }}"

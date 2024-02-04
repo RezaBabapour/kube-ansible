@@ -8,6 +8,7 @@
     - pre
 
 - name: Generate certificates
+  gather_facts: no
   hosts: deployer
   roles:
     - certificate-ca
@@ -15,6 +16,7 @@
     - create-certs
 
 - name: Copy certificates
+  gather_facts: no
   hosts: deployer
   roles:
     - copy-certs
@@ -22,14 +24,23 @@
     - copy-certs
 
 - name: Generate kubeconfigs
-  become: yes
+  gather_facts: no
   hosts: deployer
   roles:
     - kubeconfig
   tags:
     - kubeconfig
 
+- name: Copy kubeconfigs
+  gather_facts: no
+  hosts: deployer
+  roles:
+    - copy-kubeconfig
+  tags:
+    - copy-kubeconfig
+
 - name: Copy binaries to nodes
+  gather_facts: no
   become: yes
   hosts: deployer
   roles:

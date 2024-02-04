@@ -1,23 +1,16 @@
 ---
 - name: Copy certs into worker nodes
   shell: |
-    scp -o StrictHostKeyChecking=no ca.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/ca.pem
-    scp -o StrictHostKeyChecking=no {{ item }}.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/{{ item }}.pem
-    scp -o StrictHostKeyChecking=no {{ item }}-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/{{ item }}-key.pem
+    scp -o StrictHostKeyChecking=no ca.pem {{ item }}.pem {{ item }}-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/
   with_items: "{{ groups['worker'] }}"
   args:
     chdir: "{{ kubernetes.certificate.directory }}"
 
 - name: Copy certs into controller nodes
   shell: |
-    scp -o StrictHostKeyChecking=no ca.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/ca.pem
-    scp -o StrictHostKeyChecking=no ca-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/ca-key.pem
-    scp -o StrictHostKeyChecking=no admin.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/admin.pem
-    scp -o StrictHostKeyChecking=no admin-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/admin-key.pem
-    scp -o StrictHostKeyChecking=no kubernetes.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/kubernetes.pem
-    scp -o StrictHostKeyChecking=no kubernetes-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/kubernetes-key.pem
-    scp -o StrictHostKeyChecking=no service-account-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/service-account-key.pem
-    scp -o StrictHostKeyChecking=no service-account.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/service-account.pem
+    scp -o StrictHostKeyChecking=no ca.pem ca-key.pem admin.pem admin-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/
+    scp -o StrictHostKeyChecking=no kubernetes.pem kubernetes-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/
+    scp -o StrictHostKeyChecking=no service-account.pem service-account-key.pem {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:~/
   with_items: "{{ groups['controller'] }}"
   args:
     chdir: "{{ kubernetes.certificate.directory }}"

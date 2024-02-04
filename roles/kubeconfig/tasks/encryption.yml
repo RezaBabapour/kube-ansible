@@ -3,17 +3,3 @@
   template:
     src: encryption-config.yaml.j2
     dest: "{{ kubernetes.certificate.directory }}/encryption-config.yaml"
-  tags:
-    - encryption-config
-
-- name: Copy Encryption Config into controller nodes
-  vars:
-    controllers: "{{ groups['controller'] | join(' ') }}"
-  args:
-    chdir: "{{ kubernetes.certificate.directory }}"
-  shell: |
-    for instance in {{ controllers }}; do
-      scp  encryption-config.yaml {{ user }}@${instance}:~/encryption-config.yaml
-    done
-  tags:
-    - encryption-config 

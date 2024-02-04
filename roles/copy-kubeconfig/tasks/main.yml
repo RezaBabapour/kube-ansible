@@ -1,0 +1,3 @@
+---
+- include: copy-kubeconfig.yml
+- include: copy-encryption.yml

@@ -1,6 +1,3 @@
 ---
 - include: kubeconfig.yml
-- include: move-kubeconfigs.yml
 - include: encryption.yml
-  become: yes
-  become_user: "{{ user }}"
