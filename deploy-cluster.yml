@@ -48,6 +48,7 @@
     - copy-bin
 
 - name: Create etcd cluster
+  gather_facts: no
   become: yes
   hosts: etcd
   roles:

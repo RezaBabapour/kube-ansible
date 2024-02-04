@@ -1,16 +1,16 @@
 ---
 - name: Copy worker binaries to worker nodes
-  vars:
-    workers: "{{ groups['worker'] | join(' ') }}"
   shell: |
-    for instance in {{ workers }}; do
-      scp files/{{ kubernetes.version }}/crictl {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/kubectl {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/kube-proxy {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/kubelet {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/runc {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/containerd/bin/* {{ user }}@${instance}:/bin
-      rsync -a --mkpath files/{{ kubernetes.version }}/cni/* {{ user }}@${instance}:/opt/cni/bin
-    done
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kubectl {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-proxy {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kubelet {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/crictl-{{ kubernetes.crictlVersion }}/crictl {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/crictl-{{ kubernetes.crictlVersion }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/runc-{{ kubernetes.runcVersion }}/runc {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/runc-{{ kubernetes.runcVersion }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/containerd-{{ kubernetes.containerdVersion }}/* {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/containerd-{{ kubernetes.containerdVersion }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/cni-{{ kubernetes.cniVersion }}/* {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/cni-{{ kubernetes.cniVersion }}/
+
+  with_items: "{{ groups['worker'] }}"
+  args:
+    chdir: "{{ kubernetes.certificate.directory }}"
   tags:
     - worker-bin
