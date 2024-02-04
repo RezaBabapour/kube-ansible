@@ -1,13 +1,12 @@
 ---
 - name: Copy controller binaries to controller nodes
-  vars:
-    controllers: "{{ groups['controller'] | join(' ') }}"
   shell: |
-    for instance in {{ controllers }}; do
-      scp files/{{ kubernetes.version }}/kube-apiserver {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/kube-controller-manager {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/kube-scheduler {{ user }}@${instance}:/usr/local/bin
-      scp files/{{ kubernetes.version }}/kubectl {{ user }}@${instance}:/usr/local/bin
-    done
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-apiserver {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-controller-manager {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kube-scheduler {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/{{ kubernetes.version }}/kubectl {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/{{ kubernetes.version }}/
+  with_items: "{{ groups['controller'] }}"
+  args:
+    chdir: "{{ kubernetes.certificate.directory }}"
   tags:
     - controller-bin
