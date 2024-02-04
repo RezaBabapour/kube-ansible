@@ -1,4 +1,23 @@
 ---
+- name: Stop etcd
+  systemd:
+    name: etcd
+    state: stopped
+    daemon_reload: no
+    enabled: yes
+  ignore_errors: yes
+
+- name: Copy etcd binary files
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin/
+    mode: '0755'
+    remote_src: yes
+  with_items:
+    - /tmp/etcd-{{ kubernetes.etcdVersion }}/etcd
+    - /tmp/etcd-{{ kubernetes.etcdVersion }}/etcdctl
+    - /tmp/etcd-{{ kubernetes.etcdVersion }}/etcdutl
+
 - name: Create /etc/etcd and /var/lib/etcd directories
   file:
     path: "{{ item }}"
@@ -12,16 +31,17 @@
   copy:
     src: "{{ item }}"
     dest: /etc/etcd/
+    remote_src: yes
   with_items:
-    - ~/ca.pem
-    - ~/kubernetes-key.pem
-    - ~/kubernetes.pem
+    - /tmp/ca.pem
+    - /tmp/kubernetes-key.pem
+    - /tmp/kubernetes.pem
 
 - name: Create etcd systemd unit file
   template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
-    mode: 644
+    mode: '644'
 
 - name: Restart etcd
   systemd:
