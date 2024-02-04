@@ -4,6 +4,7 @@ ansible_python_interpreter: /usr/bin/python3
 
 kubernetes:
   clusterName: podspace-pardis-01
+  etcdVersion: v3.5.12
   version: v1.29.1
   # manifests:
   #   dir: /opt/kube-ansible/manifests

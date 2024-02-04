@@ -41,7 +41,6 @@
 
 - name: Copy binaries to nodes
   gather_facts: no
-  become: yes
   hosts: deployer
   roles:
     - copy-bin

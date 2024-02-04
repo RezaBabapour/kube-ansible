@@ -1,33 +1,9 @@
 ---
-- name: Stop etcd.service if running
-  vars:
-    etcds: "{{ groups['etcd'] | join(' ') }}"
-  shell: |
-    for instance in {{ etcds }}; do
-      ssh -tq {{ user }}@${instance} "systemctl stop etcd.service"
-    done
-  ignore_errors: yes
-  tags:
-    - etcd-bin
-
 - name: Copy etcd binaries to etcd nodes
-  vars:
-    etcds: "{{ groups['etcd'] | join(' ') }}"
   shell: |
-    for instance in {{ etcds }}; do
-      scp files/{{ kubernetes.version }}/etcd/etcd* {{ user }}@${instance}:/usr/local/bin
-    done
+    rsync -avz -e "ssh -o StrictHostKeyChecking=no" {{ kubernetes.bin.directory }}/etcd-{{ kubernetes.etcdVersion }}/etcd* {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}:/tmp/etcd-{{ kubernetes.etcdVersion }}
+  with_items: "{{ groups['worker'] }}"
+  args:
+    chdir: "{{ kubernetes.certificate.directory }}"
   tags:
     - etcd-bin
-
-- name: Start etcd.service
-  vars:
-    etcds: "{{ groups['etcd'] | join(' ') }}"
-  shell: |
-    for instance in {{ etcds }}; do
-      ssh -tq {{ user }}@${instance} "systemctl start etcd.service"
-    done
-  ignore_errors: yes
-  tags:
-    - etcd-bin
-

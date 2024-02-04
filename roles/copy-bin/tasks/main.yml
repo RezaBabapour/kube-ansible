@@ -2,5 +2,3 @@
 - include: etcd-bin.yml
 - include: controller-bin.yml
 - include: worker-bin.yml
-  become: yes
-  become_user: "{{ user }}"
